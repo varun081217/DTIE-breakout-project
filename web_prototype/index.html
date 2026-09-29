@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniFind - Campus Lost & Found Mobile App Prototype</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="desktop-wrapper">
+    <div class="control-panel">
+      <h1><i class="fa-solid fa-graduation-cap"></i> UniFind App Prototype</h1>
+      <p>Interactive mobile prototype for University Lost & Found Circles.</p>
+
+      <div class="demo-passcodes">
+        <h3><i class="fa-solid fa-key"></i> Quick Demo Passcodes:</h3>
+        <button class="chip-btn" onclick="fillPasscode('MIT-FOUND')">🏛️ MIT-FOUND</button>
+        <button class="chip-btn" onclick="fillPasscode('STANFORD-2026')">🌲 STANFORD-2026</button>
+        <button class="chip-btn" onclick="fillPasscode('OXFORD-101')">🎓 OXFORD-101</button>
+      </div>
+
+      <div class="quick-instructions">
+        <h3><i class="fa-solid fa-circle-info"></i> How it works:</h3>
+        <ul>
+          <li>Enter a <strong>University Passcode</strong> to join your campus circle.</li>
+          <li>Browse today's lost & found reports or filter by status.</li>
+          <li>Click <strong>+ Report Item</strong> to upload a photo, location, and contact.</li>
+          <li>Click any item card to see current location & claim info.</li>
+        </ul>
+      </div>
+
+      <div class="workspace-tip">
+        <i class="fa-solid fa-folder-open"></i> Flutter Source Code Location:
+        <code>scratch/uni_find_app/flutter_app</code>
+      </div>
+    </div>
+
+    <!-- Phone Simulator Container -->
+    <div class="phone-simulator">
+      <div class="phone-speaker"></div>
+      
+      <!-- Screen Views Container -->
+      <div class="phone-screen">
+        
+        <!-- Top Status Bar -->
+        <div class="status-bar">
+          <span id="clock">13:45</span>
+          <div class="status-icons">
+            <i class="fa-solid fa-wifi"></i>
+            <i class="fa-solid fa-signal"></i>
+            <i class="fa-solid fa-battery-full"></i>
+          </div>
+        </div>
+
+        <!-- VIEW 1: PASSCODE ENTRY -->
+        <div id="view-passcode" class="view active">
+          <div class="auth-hero">
+            <div class="app-icon-badge">
+              <i class="fa-solid fa-school"></i>
+            </div>
+            <h2>UniFind</h2>
+            <p>University Circle Lost & Found Portal</p>
+          </div>
+
+          <div class="card auth-card">
+            <h3>Enter University Passcode</h3>
+            <p class="subtext">Access your university's private Lost & Found daily feed.</p>
+            
+            <div class="input-group">
+              <i class="fa-solid fa-key input-icon"></i>
+              <input type="text" id="passcode-input" placeholder="e.g. MIT-FOUND" uppercase>
+            </div>
+            <div id="auth-error" class="error-msg hidden">Invalid Passcode! Try MIT-FOUND or STANFORD-2026.</div>
+
+            <button class="btn btn-primary" onclick="handleJoinPasscode()">JOIN CAMPUS CIRCLE</button>
+          </div>
+
+          <div class="create-circle-sec">
+            <p>Admin creating a new circle?</p>
+            <button class="btn btn-outline" onclick="showCreateModal()">+ Create University Circle</button>
+          </div>
+        </div>
+
+        <!-- VIEW 2: CAMPUS DASHBOARD -->
+        <div id="view-dashboard" class="view hidden">
+          <!-- App Bar Header -->
+          <header class="app-header">
+            <div class="circle-info">
+              <span id="circle-badge" class="badge-emoji">🏛️</span>
+              <div>
+                <h3 id="circle-name">MIT Campus Circle</h3>
+                <span id="circle-meta" class="sub-meta">Passcode: MIT-FOUND • 4,250 members</span>
+              </div>
+            </div>
+            <button class="icon-btn" onclick="handleLeaveCircle()" title="Switch Circle">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+          </header>
+
+          <!-- Search & Filter Bar -->
+          <div class="search-filter-box">
+            <div class="search-bar">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="search-input" placeholder="Search reported items or places..." oninput="renderItems()">
+            </div>
+            
+            <div class="filter-row">
+              <div class="status-chips">
+                <button class="status-chip active" data-status="ALL" onclick="setStatusFilter('ALL', this)">All</button>
+                <button class="status-chip" data-status="LOST" onclick="setStatusFilter('LOST', this)">🔴 Lost</button>
+                <button class="status-chip" data-status="FOUND" onclick="setStatusFilter('FOUND', this)">🟢 Found</button>
+                <button class="status-chip" data-status="CLAIMED" onclick="setStatusFilter('CLAIMED', this)">⚪ Claimed</button>
+              </div>
+              <button id="today-toggle" class="today-btn" onclick="toggleTodayFilter()">⚡ Today</button>
+            </div>
+          </div>
+
+          <!-- Feed Container -->
+          <div id="items-container" class="items-list">
+            <!-- Dynamic items rendered via app.js -->
+          </div>
+
+          <!-- Floating Action Button -->
+          <button class="fab" onclick="showReportModal()">
+            <i class="fa-solid fa-plus"></i> REPORT ITEM
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REPORT ITEM -->
+  <div id="report-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bullhorn"></i> Report Lost or Found Item</h3>
+        <button class="close-btn" onclick="closeReportModal()">&times;</button>
+      </div>
+      <form id="report-form" onsubmit="handleReportSubmit(event)">
+        
+        <div class="status-radio-group">
+          <label class="radio-label lost">
+            <input type="radio" name="itemStatus" value="LOST">
+            <span>🔴 I LOST This Item</span>
+          </label>
+          <label class="radio-label found">
+            <input type="radio" name="itemStatus" value="FOUND" checked>
+            <span>🟢 I FOUND This Item</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>Item Name / Title *</label>
+          <input type="text" id="form-title" placeholder="e.g. Silver AirPods Pro in Black Case" required>
+        </div>
+
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="form-category" required>
+            <option value="electronics">Electronics / Gadgets</option>
+            <option value="keys">Keys</option>
+            <option value="idCard">ID Card / Badge</option>
+            <option value="wallet">Wallet / Purse</option>
+            <option value="clothing">Clothing / Accessories</option>
+            <option value="books">Books & Stationery</option>
+            <option value="bag">Bag / Backpack</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Description / Remarks / Condition *</label>
+          <textarea id="form-desc" rows="3" placeholder="Specify color, marks, condition, or confidential detail..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Place Where Lost / Found *</label>
+          <input type="text" id="form-location" placeholder="e.g. Central Library, 3rd Floor" required>
+        </div>
+
+        <div class="form-group">
+          <label>Where is the item right now? *</label>
+          <input type="text" id="form-storage" placeholder="e.g. Main Security Desk Gate 1 / Held by me" required>
+        </div>
+
+        <div class="form-section-title">Designated Contact Information</div>
+
+        <div class="form-group">
+          <label>Contact Person Name *</label>
+          <input type="text" id="form-contact-name" placeholder="e.g. Officer Alex Rivera" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone / WhatsApp Number *</label>
+          <input type="text" id="form-contact-phone" placeholder="e.g. +1 (555) 019-2831" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" id="form-contact-email" placeholder="e.g. alex@university.edu" required>
+        </div>
+
+        <div class="form-group">
+          <label>Photo URL (Optional preset ready)</label>
+          <input type="url" id="form-photo" placeholder="https://..." value="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">PUBLISH TO CAMPUS CIRCLE</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ITEM DETAILS -->
+  <div id="detail-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-circle-info"></i> Item Details</h3>
+        <button class="close-btn" onclick="closeDetailModal()">&times;</button>
+      </div>
+      <div id="detail-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE CIRCLE -->
+  <div id="create-circle-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-plus-circle"></i> Create University Circle</h3>
+        <button class="close-btn" onclick="closeCreateModal()">&times;</button>
+      </div>
+      <form id="create-circle-form" onsubmit="handleCreateCircleSubmit(event)">
+        <div class="form-group">
+          <label>University Name *</label>
+          <input type="text" id="new-circle-name" placeholder="e.g. Harvard University" required>
+        </div>
+        <div class="form-group">
+          <label>Create Passcode *</label>
+          <input type="text" id="new-circle-code" placeholder="e.g. HARVARD-2026" required uppercase>
+        </div>
+        <div class="form-group">
+          <label>Campus Location *</label>
+          <input type="text" id="new-circle-loc" placeholder="e.g. Cambridge, MA" required>
+        </div>
+        <div class="form-group">
+          <label>Admin Contact Email *</label>
+          <input type="email" id="new-circle-email" placeholder="e.g. admin@harvard.edu" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">CREATE & JOIN CIRCLE</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
