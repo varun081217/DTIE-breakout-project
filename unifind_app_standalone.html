@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniFind - Campus Lost & Found Mobile App Prototype</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #3f51b5;
+      --primary-dark: #303f9f;
+      --primary-light: #e8eaf6;
+      --accent: #ff4081;
+      --bg-dark: #1a1c2e;
+      --card-bg: #ffffff;
+      --text-main: #212121;
+      --text-muted: #666666;
+      --lost-red: #e53935;
+      --found-green: #43a047;
+      --claimed-gray: #757575;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .desktop-wrapper {
+      display: flex;
+      gap: 40px;
+      max-width: 1100px;
+      width: 100%;
+      align-items: center;
+    }
+
+    .control-panel {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 20px;
+    }
+
+    .control-panel h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: #818cf8;
+    }
+
+    .control-panel p {
+      color: #94a3b8;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .demo-passcodes {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .demo-passcodes h3 {
+      font-size: 14px;
+      color: #f1f5f9;
+      margin-bottom: 10px;
+    }
+
+    .chip-btn {
+      background: #334155;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      transition: all 0.2s;
+    }
+
+    .chip-btn:hover {
+      background: #6366f1;
+    }
+
+    .quick-instructions {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    .quick-instructions h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .quick-instructions ul {
+      padding-left: 20px;
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .workspace-tip {
+      font-size: 12px;
+      color: #a5b4fc;
+    }
+
+    .workspace-tip code {
+      display: block;
+      margin-top: 4px;
+      background: #0f172a;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+
+    /* PHONE SIMULATOR SHELL */
+    .phone-simulator {
+      width: 380px;
+      height: 760px;
+      background: #000;
+      border-radius: 48px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 12px #1e293b, 0 0 0 14px #334155;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-speaker {
+      width: 120px;
+      height: 24px;
+      background: #000;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      z-index: 100;
+    }
+
+    .phone-screen {
+      flex: 1;
+      background: #f8fafc;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .status-bar {
+      height: 40px;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--primary-dark);
+      z-index: 90;
+    }
+
+    .status-icons {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* VIEWS */
+    .view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .view.hidden {
+      display: none !important;
+    }
+
+    /* AUTH VIEW */
+    #view-passcode {
+      background: linear-gradient(135deg, #303f9f 0%, #1a237e 100%);
+      color: #fff;
+      padding: 24px;
+      text-align: center;
+      justify-content: center;
+    }
+
+    .auth-hero {
+      margin-bottom: 30px;
+    }
+
+    .app-icon-badge {
+      width: 72px;
+      height: 72px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 36px;
+      color: #ffd54f;
+      margin: 0 auto 16px;
+    }
+
+    .auth-hero h2 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .auth-hero p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .auth-card {
+      background: #fff;
+      color: var(--text-main);
+      padding: 24px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .auth-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .subtext {
+      font-size: 12px;
+      color: #666;
+      margin: 6px 0 16px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 12px 12px 40px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font-size: 14px;
+      text-transform: uppercase;
+    }
+
+    .error-msg {
+      color: var(--lost-red);
+      font-size: 12px;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .create-circle-sec {
+      margin-top: 24px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* DASHBOARD VIEW */
+    .app-header {
+      background: var(--primary-dark);
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .circle-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-emoji {
+      font-size: 24px;
+    }
+
+    .circle-info h3 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .sub-meta {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .search-filter-box {
+      background: var(--primary-dark);
+      padding: 0 16px 14px;
+    }
+
+    .search-bar {
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .search-bar i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 10px 10px 10px 36px;
+      border: none;
+      border-radius: 20px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .filter-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-chips {
+      display: flex;
+      gap: 4px;
+    }
+
+    .status-chip {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .status-chip.active {
+      background: #fff;
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .today-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 14px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .today-btn.active {
+      background: #f59e0b;
+      color: #fff;
+    }
+
+    /* FEED ITEMS LIST */
+    .items-list {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+    }
+
+    .item-card {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      margin-bottom: 14px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .item-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .card-img-wrap {
+      height: 160px;
+      position: relative;
+      background: #e2e8f0;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-lost { background: var(--lost-red); }
+    .badge-found { background: var(--found-green); }
+    .badge-claimed { background: var(--claimed-gray); }
+
+    .badge-today {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #f59e0b;
+      color: #fff;
+      font-size: 9px;
+      padding: 3px 6px;
+      border-radius: 8px;
+      font-weight: 800;
+    }
+
+    .card-body {
+      padding: 12px;
+    }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .card-title-row h4 {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .cat-chip {
+      font-size: 10px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-meta-line {
+      font-size: 11px;
+      color: #334155;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+
+    .card-meta-line i {
+      width: 14px;
+      color: var(--primary);
+    }
+
+    .fab {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 12px;
+      box-shadow: 0 4px 14px rgba(63, 81, 181, 0.4);
+      cursor: pointer;
+    }
+
+    /* MODALS */
+    .modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 200;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    .modal.hidden {
+      display: none !important;
+    }
+
+    .modal-content {
+      background: #fff;
+      color: var(--text-main);
+      width: 100%;
+      max-height: 90%;
+      border-top-left-radius: 24px;
+      border-top-right-radius: 24px;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 10px;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      color: var(--primary-dark);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #64748b;
+    }
+
+    .status-radio-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .radio-label {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--primary);
+      margin: 16px 0 8px;
+    }
+
+    .btn-block {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop-wrapper">
+    <div class="control-panel">
+      <h1><i class="fa-solid fa-graduation-cap"></i> UniFind App Prototype</h1>
+      <p>Interactive mobile prototype for University Lost & Found Circles.</p>
+
+      <div class="demo-passcodes">
+        <h3><i class="fa-solid fa-key"></i> Quick Demo Passcodes:</h3>
+        <button class="chip-btn" onclick="fillPasscode('MIT-FOUND')">🏛️ MIT-FOUND</button>
+        <button class="chip-btn" onclick="fillPasscode('STANFORD-2026')">🌲 STANFORD-2026</button>
+        <button class="chip-btn" onclick="fillPasscode('OXFORD-101')">🎓 OXFORD-101</button>
+      </div>
+
+      <div class="quick-instructions">
+        <h3><i class="fa-solid fa-circle-info"></i> How it works:</h3>
+        <ul>
+          <li>Enter a <strong>University Passcode</strong> to join your campus circle.</li>
+          <li>Browse today's lost & found reports or filter by status.</li>
+          <li>Click <strong>+ Report Item</strong> to upload a photo, location, and contact.</li>
+          <li>Click any item card to see current location & claim info.</li>
+        </ul>
+      </div>
+
+      <div class="workspace-tip">
+        <i class="fa-solid fa-folder-open"></i> GitHub Repository:
+        <code>varun081217/DTIE-breakout-project</code>
+      </div>
+    </div>
+
+    <!-- Phone Simulator Container -->
+    <div class="phone-simulator">
+      <div class="phone-speaker"></div>
+      
+      <!-- Screen Views Container -->
+      <div class="phone-screen">
+        
+        <!-- Top Status Bar -->
+        <div class="status-bar">
+          <span id="clock">13:45</span>
+          <div class="status-icons">
+            <i class="fa-solid fa-wifi"></i>
+            <i class="fa-solid fa-signal"></i>
+            <i class="fa-solid fa-battery-full"></i>
+          </div>
+        </div>
+
+        <!-- VIEW 1: PASSCODE ENTRY -->
+        <div id="view-passcode" class="view active">
+          <div class="auth-hero">
+            <div class="app-icon-badge">
+              <i class="fa-solid fa-school"></i>
+            </div>
+            <h2>UniFind</h2>
+            <p>University Circle Lost & Found Portal</p>
+          </div>
+
+          <div class="card auth-card">
+            <h3>Enter University Passcode</h3>
+            <p class="subtext">Access your university's private Lost & Found daily feed.</p>
+            
+            <div class="input-group">
+              <i class="fa-solid fa-key input-icon"></i>
+              <input type="text" id="passcode-input" placeholder="e.g. MIT-FOUND" uppercase>
+            </div>
+            <div id="auth-error" class="error-msg hidden">Invalid Passcode! Try MIT-FOUND or STANFORD-2026.</div>
+
+            <button class="btn btn-primary" onclick="handleJoinPasscode()">JOIN CAMPUS CIRCLE</button>
+          </div>
+
+          <div class="create-circle-sec">
+            <p>Admin creating a new circle?</p>
+            <button class="btn btn-outline" onclick="showCreateModal()">+ Create University Circle</button>
+          </div>
+        </div>
+
+        <!-- VIEW 2: CAMPUS DASHBOARD -->
+        <div id="view-dashboard" class="view hidden">
+          <!-- App Bar Header -->
+          <header class="app-header">
+            <div class="circle-info">
+              <span id="circle-badge" class="badge-emoji">🏛️</span>
+              <div>
+                <h3 id="circle-name">MIT Campus Circle</h3>
+                <span id="circle-meta" class="sub-meta">Passcode: MIT-FOUND • 4,250 members</span>
+              </div>
+            </div>
+            <button class="icon-btn" onclick="handleLeaveCircle()" title="Switch Circle">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+          </header>
+
+          <!-- Search & Filter Bar -->
+          <div class="search-filter-box">
+            <div class="search-bar">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="search-input" placeholder="Search reported items or places..." oninput="renderItems()">
+            </div>
+            
+            <div class="filter-row">
+              <div class="status-chips">
+                <button class="status-chip active" data-status="ALL" onclick="setStatusFilter('ALL', this)">All</button>
+                <button class="status-chip" data-status="LOST" onclick="setStatusFilter('LOST', this)">🔴 Lost</button>
+                <button class="status-chip" data-status="FOUND" onclick="setStatusFilter('FOUND', this)">🟢 Found</button>
+                <button class="status-chip" data-status="CLAIMED" onclick="setStatusFilter('CLAIMED', this)">⚪ Claimed</button>
+              </div>
+              <button id="today-toggle" class="today-btn" onclick="toggleTodayFilter()">⚡ Today</button>
+            </div>
+          </div>
+
+          <!-- Feed Container -->
+          <div id="items-container" class="items-list">
+            <!-- Dynamic items rendered via script -->
+          </div>
+
+          <!-- Floating Action Button -->
+          <button class="fab" onclick="showReportModal()">
+            <i class="fa-solid fa-plus"></i> REPORT ITEM
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REPORT ITEM -->
+  <div id="report-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bullhorn"></i> Report Lost or Found Item</h3>
+        <button class="close-btn" onclick="closeReportModal()">&times;</button>
+      </div>
+      <form id="report-form" onsubmit="handleReportSubmit(event)">
+        
+        <div class="status-radio-group">
+          <label class="radio-label lost">
+            <input type="radio" name="itemStatus" value="LOST">
+            <span>🔴 I LOST This Item</span>
+          </label>
+          <label class="radio-label found">
+            <input type="radio" name="itemStatus" value="FOUND" checked>
+            <span>🟢 I FOUND This Item</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label>Item Name / Title *</label>
+          <input type="text" id="form-title" placeholder="e.g. Silver AirPods Pro in Black Case" required>
+        </div>
+
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="form-category" required>
+            <option value="electronics">Electronics / Gadgets</option>
+            <option value="keys">Keys</option>
+            <option value="idCard">ID Card / Badge</option>
+            <option value="wallet">Wallet / Purse</option>
+            <option value="clothing">Clothing / Accessories</option>
+            <option value="books">Books & Stationery</option>
+            <option value="bag">Bag / Backpack</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Description / Remarks / Condition *</label>
+          <textarea id="form-desc" rows="3" placeholder="Specify color, marks, condition, or confidential detail..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Place Where Lost / Found *</label>
+          <input type="text" id="form-location" placeholder="e.g. Central Library, 3rd Floor" required>
+        </div>
+
+        <div class="form-group">
+          <label>Where is the item right now? *</label>
+          <input type="text" id="form-storage" placeholder="e.g. Main Security Desk Gate 1 / Held by me" required>
+        </div>
+
+        <div class="form-section-title">Designated Contact Information</div>
+
+        <div class="form-group">
+          <label>Contact Person Name *</label>
+          <input type="text" id="form-contact-name" placeholder="e.g. Officer Alex Rivera" required>
+        </div>
+
+        <div class="form-group">
+          <label>Phone / WhatsApp Number *</label>
+          <input type="text" id="form-contact-phone" placeholder="e.g. +1 (555) 019-2831" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address *</label>
+          <input type="email" id="form-contact-email" placeholder="e.g. alex@university.edu" required>
+        </div>
+
+        <div class="form-group">
+          <label>Photo URL (Optional preset ready)</label>
+          <input type="url" id="form-photo" placeholder="https://..." value="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">PUBLISH TO CAMPUS CIRCLE</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ITEM DETAILS -->
+  <div id="detail-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-circle-info"></i> Item Details</h3>
+        <button class="close-btn" onclick="closeDetailModal()">&times;</button>
+      </div>
+      <div id="detail-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE CIRCLE -->
+  <div id="create-circle-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-plus-circle"></i> Create University Circle</h3>
+        <button class="close-btn" onclick="closeCreateModal()">&times;</button>
+      </div>
+      <form id="create-circle-form" onsubmit="handleCreateCircleSubmit(event)">
+        <div class="form-group">
+          <label>University Name *</label>
+          <input type="text" id="new-circle-name" placeholder="e.g. Harvard University" required>
+        </div>
+        <div class="form-group">
+          <label>Create Passcode *</label>
+          <input type="text" id="new-circle-code" placeholder="e.g. HARVARD-2026" required uppercase>
+        </div>
+        <div class="form-group">
+          <label>Campus Location *</label>
+          <input type="text" id="new-circle-loc" placeholder="e.g. Cambridge, MA" required>
+        </div>
+        <div class="form-group">
+          <label>Admin Contact Email *</label>
+          <input type="email" id="new-circle-email" placeholder="e.g. admin@harvard.edu" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">CREATE & JOIN CIRCLE</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // State & Data
+    const state = {
+      activeCircle: null,
+      statusFilter: 'ALL',
+      onlyToday: false,
+      searchQuery: '',
+      circles: [
+        { id: 'mit_circle', name: 'MIT Campus Circle', passcode: 'MIT-FOUND', location: 'Cambridge, MA', badge: '🏛️', members: 4250 },
+        { id: 'stanford_circle', name: 'Stanford University', passcode: 'STANFORD-2026', location: 'Stanford, CA', badge: '🌲', members: 6100 },
+        { id: 'oxford_circle', name: 'University of Oxford', passcode: 'OXFORD-101', location: 'Oxford, UK', badge: '🎓', members: 3890 }
+      ],
+      items: [
+        {
+          id: 'item_1',
+          circleId: 'mit_circle',
+          status: 'FOUND',
+          title: 'Apple MacBook Air (Space Gray)',
+          category: 'Electronics',
+          description: 'Found on 3rd floor study desk in the Central Library. Has a sticker of NASA on top lid.',
+          location: 'Central Library, 3rd Floor Desk 14',
+          storage: 'Main Gate Security Desk',
+          contactName: 'Alex Rivera (Security Officer)',
+          contactPhone: '+1 (555) 019-2831',
+          contactEmail: 'alex.rivera@mit.edu',
+          photo: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500',
+          date: new Date().toISOString()
+        },
+        {
+          id: 'item_2',
+          circleId: 'mit_circle',
+          status: 'LOST',
+          title: 'Blue Leather Wallet with Student ID',
+          category: 'Wallet',
+          description: 'Lost somewhere between Science Block B and Student Dining Hall around lunch time.',
+          location: 'Pathway near Science Block B',
+          storage: 'Searching / With Student',
+          contactName: 'Sarah Jenkins',
+          contactPhone: '+1 (555) 014-9922',
+          contactEmail: 's.jenkins@student.mit.edu',
+          photo: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500',
+          date: new Date().toISOString()
+        },
+        {
+          id: 'item_3',
+          circleId: 'stanford_circle',
+          status: 'FOUND',
+          title: 'Set of 4 Brass Keys with Red Keychain',
+          category: 'Keys',
+          description: 'Found near the Outdoor Basketball Courts after 5 PM pickup game.',
+          location: 'Sports Complex Basketball Court 2',
+          storage: 'Sports Admin Desk (Room 102)',
+          contactName: 'Coach Michael',
+          contactPhone: '+1 (555) 018-4411',
+          contactEmail: 'm.coach@stanford.edu',
+          photo: 'https://images.unsplash.com/photo-1582139329536-e7284fece509?w=500',
+          date: new Date().toISOString()
+        },
+        {
+          id: 'item_4',
+          circleId: 'mit_circle',
+          status: 'CLAIMED',
+          title: 'Calculus & Physics Textbooks in Nike Bag',
+          category: 'Bag / Books',
+          description: 'Black Nike backpack containing 2 textbooks and a blue pencil pouch.',
+          location: 'Engineering Auditorium 101',
+          storage: 'Returned to Owner',
+          contactName: 'Jessica Wu',
+          contactPhone: '+1 (555) 012-7744',
+          contactEmail: 'j.wu@student.mit.edu',
+          photo: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500',
+          date: new Date(Date.now() - 86400000).toISOString()
+        }
+      ]
+    };
+
+    function updateClock() {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${hrs}:${mins}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function fillPasscode(code) {
+      document.getElementById('passcode-input').value = code;
+    }
+
+    function handleJoinPasscode() {
+      const input = document.getElementById('passcode-input').value.trim().toUpperCase();
+      const found = state.circles.find(c => c.passcode.toUpperCase() === input);
+
+      if (found) {
+        state.activeCircle = found;
+        document.getElementById('auth-error').classList.add('hidden');
+        showDashboardView();
+      } else {
+        document.getElementById('auth-error').classList.remove('hidden');
+      }
+    }
+
+    function handleLeaveCircle() {
+      state.activeCircle = null;
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-passcode').classList.remove('hidden');
+    }
+
+    function showDashboardView() {
+      document.getElementById('view-passcode').classList.add('hidden');
+      document.getElementById('view-dashboard').classList.remove('hidden');
+
+      document.getElementById('circle-badge').textContent = state.activeCircle.badge;
+      document.getElementById('circle-name').textContent = state.activeCircle.name;
+      document.getElementById('circle-meta').textContent = `Passcode: ${state.activeCircle.passcode} • ${state.activeCircle.members} members`;
+
+      renderItems();
+    }
+
+    function setStatusFilter(status, el) {
+      state.statusFilter = status;
+      document.querySelectorAll('.status-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      renderItems();
+    }
+
+    function toggleTodayFilter() {
+      state.onlyToday = !state.onlyToday;
+      const btn = document.getElementById('today-toggle');
+      if (state.onlyToday) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+      renderItems();
+    }
+
+    function renderItems() {
+      const container = document.getElementById('items-container');
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+
+      const filtered = state.items.filter(item => {
+        if (item.circleId !== state.activeCircle.id) return false;
+        if (state.statusFilter !== 'ALL' && item.status !== state.statusFilter) return false;
+        
+        if (state.onlyToday) {
+          const itemDate = new Date(item.date).toDateString();
+          const today = new Date().toDateString();
+          if (itemDate !== today) return false;
+        }
+
+        if (query) {
+          const titleMatch = item.title.toLowerCase().includes(query);
+          const descMatch = item.description.toLowerCase().includes(query);
+          const locMatch = item.location.toLowerCase().includes(query);
+          if (!titleMatch && !descMatch && !locMatch) return false;
+        }
+
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding: 40px 20px; color: #94a3b8;">
+            <i class="fa-solid fa-folder-open" style="font-size: 48px; margin-bottom: 12px; color: #cbd5e1;"></i>
+            <h4 style="font-size: 16px; color: #334155; margin-bottom: 6px;">No items reported yet!</h4>
+            <p style="font-size: 12px;">Be the first to report a lost or found item in your campus circle.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(item => {
+        const isToday = new Date(item.date).toDateString() === new Date().toDateString();
+        const dateFormatted = new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        let badgeClass = 'badge-found';
+        if (item.status === 'LOST') badgeClass = 'badge-lost';
+        if (item.status === 'CLAIMED') badgeClass = 'badge-claimed';
+
+        return `
+          <div class="item-card" onclick="openDetailModal('${item.id}')">
+            <div class="card-img-wrap">
+              <img src="${item.photo}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=500'">
+              <span class="card-badge ${badgeClass}">${item.status}</span>
+              ${isToday ? `<span class="badge-today">⚡ TODAY</span>` : ''}
+            </div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <h4>${item.title}</h4>
+                <span class="cat-chip">${item.category}</span>
+              </div>
+              <p class="card-desc">${item.description}</p>
+              <div class="card-meta-line">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Lost/Found at: ${item.location}</span>
+              </div>
+              <div class="card-meta-line" style="color: #0d9488; font-weight: 600;">
+                <i class="fa-solid fa-pin"></i>
+                <span>Current Spot: ${item.storage}</span>
+              </div>
+              <div class="card-meta-line" style="font-size: 10px; color: #94a3b8; justify-content: flex-end; margin-top: 6px;">
+                <span>${dateFormatted}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showReportModal() {
+      document.getElementById('report-modal').classList.remove('hidden');
+    }
+
+    function closeReportModal() {
+      document.getElementById('report-modal').classList.add('hidden');
+    }
+
+    function showCreateModal() {
+      document.getElementById('create-circle-modal').classList.remove('hidden');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('create-circle-modal').classList.add('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detail-modal').classList.add('hidden');
+    }
+
+    function handleReportSubmit(e) {
+      e.preventDefault();
+      const status = document.querySelector('input[name="itemStatus"]:checked').value;
+      const title = document.getElementById('form-title').value.trim();
+      const category = document.getElementById('form-category').value;
+      const description = document.getElementById('form-desc').value.trim();
+      const location = document.getElementById('form-location').value.trim();
+      const storage = document.getElementById('form-storage').value.trim();
+      const contactName = document.getElementById('form-contact-name').value.trim();
+      const contactPhone = document.getElementById('form-contact-phone').value.trim();
+      const contactEmail = document.getElementById('form-contact-email').value.trim();
+      const photo = document.getElementById('form-photo').value.trim() || 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500';
+
+      const newItem = {
+        id: `item_${Date.now()}`,
+        circleId: state.activeCircle.id,
+        status,
+        title,
+        category,
+        description,
+        location,
+        storage,
+        contactName,
+        contactPhone,
+        contactEmail,
+        photo,
+        date: new Date().toISOString()
+      };
+
+      state.items.unshift(newItem);
+      closeReportModal();
+      document.getElementById('report-form').reset();
+      renderItems();
+    }
+
+    function openDetailModal(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const content = document.getElementById('detail-content');
+      const dateFormatted = new Date(item.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      let badgeColor = '#43a047';
+      if (item.status === 'LOST') badgeColor = '#e53935';
+      if (item.status === 'CLAIMED') badgeColor = '#757575';
+
+      content.innerHTML = `
+        <div style="border-radius: 12px; overflow: hidden; margin-bottom: 14px; position: relative;">
+          <img src="${item.photo}" style="width: 100%; height: 200px; object-fit: cover;">
+          <span style="position: absolute; top: 10px; left: 10px; background: ${badgeColor}; color: #fff; padding: 4px 10px; border-radius: 12px; font-weight: 800; font-size: 11px;">
+            ${item.status} ITEM
+          </span>
+        </div>
+
+        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 4px;">${item.title}</h3>
+        <p style="font-size: 11px; color: #64748b; margin-bottom: 12px;">Reported on ${dateFormatted}</p>
+
+        <div style="background: #f8fafc; border-left: 4px solid #3f51b5; padding: 10px; border-radius: 6px; font-size: 12px; margin-bottom: 14px; line-height: 1.4;">
+          <strong>Remarks & Description:</strong><br>${item.description}
+        </div>
+
+        <div style="background: #e0f2fe; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 8px; color: #0369a1;">
+          <i class="fa-solid fa-location-dot"></i> <strong>Place Lost/Found:</strong> ${item.location}
+        </div>
+
+        <div style="background: #ccfbf1; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 16px; color: #0f766e;">
+          <i class="fa-solid fa-pin"></i> <strong>Current Storage Spot:</strong> ${item.storage}
+        </div>
+
+        <div style="border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+          <h4 style="font-size: 13px; color: #334155; margin-bottom: 8px;"><i class="fa-solid fa-user-shield"></i> Designated Contact Info</h4>
+          <p style="font-size: 13px; font-weight: 700;">${item.contactName}</p>
+          <p style="font-size: 12px; color: #475569;">📞 ${item.contactPhone}</p>
+          <p style="font-size: 12px; color: #475569;">✉️ ${item.contactEmail}</p>
+        </div>
+
+        ${item.status !== 'CLAIMED' ? `
+          <button class="btn btn-primary btn-block" style="background: #0d9488;" onclick="markItemClaimed('${item.id}')">
+            <i class="fa-solid fa-circle-check"></i> MARK AS CLAIMED / RETURNED
+          </button>
+        ` : ''}
+      `;
+
+      document.getElementById('detail-modal').classList.remove('hidden');
+    }
+
+    function markItemClaimed(itemId) {
+      const item = state.items.find(i => i.id === itemId);
+      if (item) {
+        item.status = 'CLAIMED';
+        closeDetailModal();
+        renderItems();
+      }
+    }
+
+    function handleCreateCircleSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-circle-name').value.trim();
+      const code = document.getElementById('new-circle-code').value.trim().toUpperCase();
+      const location = document.getElementById('new-circle-loc').value.trim();
+
+      const newCircle = {
+        id: `circle_${Date.now()}`,
+        name,
+        passcode: code,
+        location,
+        badge: '🏫',
+        members: 1
+      };
+
+      state.circles.push(newCircle);
+      state.activeCircle = newCircle;
+      closeCreateModal();
+      document.getElementById('create-circle-form').reset();
+      showDashboardView();
+    }
+  </script>
+</body>
+</html>
